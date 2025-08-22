@@ -1,0 +1,27 @@
+# docker-compose.dev.yml
+# Development overrides for hot-reloading and debugging
+version: '3.8'
+
+services:
+  mcp-server:
+    # Override command for development with more verbose logging
+    command: ["python", "-m", "uvicorn", "src.http_server:app", "--host", "0.0.0.0", "--port", "6018", "--reload", "--reload-dir", "/app/src", "--log-level", "debug"]
+    environment:
+      # Development-specific environment variables
+      - LOG_LEVEL=DEBUG
+      - PYTHONPATH=/app
+      # Enable Python development mode
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount the entire project for development
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./logs:/app/logs
+      - ./config:/app/config
+      - ./.env:/app/.env
+      # Mount requirements for package development
+      - ./requirements.txt:/app/requirements.txt
+      - ./pyproject.toml:/app/pyproject.toml
+    # Disable restart in development to see crashes immediately
+    restart: "no" 

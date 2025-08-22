@@ -1,0 +1,67 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # Regular HTTP API Server
+  mcp-server:
+    build: .
+    network_mode: "host"
+    environment:
+      - SERVER_PORT=6018
+      - LOG_LEVEL=INFO
+      - EXTERNAL_API_BASE_URL=http://iot.datawits.net:8000/api/method/frappe.integrations.api_dify.
+      - EXTERNAL_API_KEY=not_required_guest_access
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    volumes:
+      # Mount source code for hot-reloading (development)
+      - ./src:/app/src
+      - ./logs:/app/logs
+      - ./config:/app/config
+      # Optionally mount the .env file if you want to modify it without rebuild
+      - ./.env:/app/.env
+    restart: unless-stopped
+    # Enable development mode with auto-reload
+    command: ["python", "-m", "uvicorn", "src.http_server:app", "--host", "0.0.0.0", "--port", "6018", "--reload", "--reload-dir", "/app/src"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6018/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MCP Protocol Server (for Dify integration)
+  mcp-protocol-server:
+    build: .
+    network_mode: "host"
+    environment:
+      - SERVER_PORT=6019
+      - LOG_LEVEL=INFO
+      - EXTERNAL_API_BASE_URL=http://iot.datawits.net:8000/api/method/frappe.integrations.api_dify.
+      - EXTERNAL_API_KEY=not_required_guest_access
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    volumes:
+      # Mount source code for hot-reloading (development)
+      - ./src:/app/src
+      - ./logs:/app/logs
+      - ./config:/app/config
+      - ./.env:/app/.env
+    restart: unless-stopped
+    # MCP Protocol Server
+    command: ["python", "-m", "uvicorn", "src.mcp_http_server:app", "--host", "0.0.0.0", "--port", "6019", "--reload", "--reload-dir", "/app/src"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6019/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  mcp-network:
+    driver: bridge
+
+# For production with SSL
+# volumes:
+#   certbot-etc:
+#   certbot-var:

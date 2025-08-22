@@ -1,0 +1,38 @@
+{
+  "iot_cnc_sse": {
+    "transport": "sse",
+    "url": "http://127.0.0.1:6019/sse",
+    "headers": {
+      "Content-Type": "application/json",
+      "Accept": "text/event-stream"
+    },
+    "timeout": 60,
+    "sse_read_timeout": 60,
+    "description": "IoT CNC Data API via Server-Sent Events"
+  },
+  "iot_cnc_streamable": {
+    "transport": "streamable_http",
+    "url": "http://127.0.0.1:6019/mcp",
+    "headers": {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    "timeout": 60,
+    "description": "IoT CNC Data API via Streamable HTTP"
+  },
+  "iot_cnc_local_sse": {
+    "transport": "sse",
+    "url": "http://localhost:6019/sse",
+    "headers": {},
+    "timeout": 50,
+    "sse_read_timeout": 50,
+    "description": "Local IoT CNC Data API (SSE)"
+  },
+  "iot_cnc_local_streamable": {
+    "transport": "streamable_http",
+    "url": "http://localhost:6019/mcp",
+    "headers": {},
+    "timeout": 50,
+    "description": "Local IoT CNC Data API (Streamable)"
+  }
+} 
